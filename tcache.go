@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sync"
 )
 
@@ -54,7 +55,6 @@ func NewGroup(name string, getter Getter, limitedBytes int64) *Group {
 //  获取指定的Group
 func GetGroup(name string) *Group {
 	mu.RLock()
-	defer mu.Unlock()
 	g := groups[name]
 	mu.RUnlock()
 	return g
@@ -67,6 +67,7 @@ func (g *Group) Get(key string) (ByteView, error) {
 	// 从主缓存查找
 	v, ok := g.mainCache.get(key)
 	if ok {
+		log.Printf("缓存查找键%s命中\n", key)
 		return v, nil
 	}
 	// 主缓存中不存在
